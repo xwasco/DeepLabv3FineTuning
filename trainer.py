@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
+from PIL import Image
 
 def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                 num_epochs):
@@ -38,7 +39,9 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                 model.eval()  # Set model to evaluate mode
 
             # Iterate over data.
+            i = 0
             for sample in tqdm(iter(dataloaders[phase])):
+                i += 1
                 inputs = sample['image'].to(device)
                 masks = sample['mask'].to(device)
                 # zero the parameter gradients
@@ -58,6 +61,12 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                         else:
                             batchsummary[f'{phase}_{name}'].append(
                                 metric(y_true.astype('uint8'), y_pred))
+
+                    if phase == 'Test':
+                        # im = Image.fromarray(outputs['out'].data.cpu().numpy())
+                        im = Image.fromarray((outputs['out'].data.cpu().numpy()[0,0,:,:]*255).astype(np.uint8))
+                        im.save("out_" + str(i) + ".jpg")
+
 
                     # backward + optimize only if in training phase
                     if phase == 'Train':

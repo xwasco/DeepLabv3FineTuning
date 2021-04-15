@@ -17,16 +17,21 @@ from trainer import train_model
 @click.option("--exp_directory",
               required=True,
               help="Specify the experiment directory.")
+@click.option("--dir-type",
+              help="Type of dir (single, sep)",
+                default="single")
 @click.option(
     "--epochs",
-    default=25,
+    default=100,
     type=int,
     help="Specify the number of epochs you want to run the experiment for.")
+
 @click.option("--batch-size",
-              default=4,
+              default=8,
               type=int,
               help="Specify the batch size for the dataloader.")
-def main(data_directory, exp_directory, epochs, batch_size):
+
+def main(data_directory, exp_directory, epochs, batch_size, dir_type):
     # Create the deeplabv3 resnet101 model which is pretrained on a subset
     # of COCO train2017, on the 20 categories that are present in the Pascal VOC dataset.
     model = createDeepLabv3()
@@ -46,8 +51,15 @@ def main(data_directory, exp_directory, epochs, batch_size):
     metrics = {'f1_score': f1_score, 'auroc': roc_auc_score}
 
     # Create the dataloader
-    dataloaders = datahandler.get_dataloader_single_folder(
-        data_directory, batch_size=batch_size)
+
+    if dir_type == "single":
+        dataloaders = datahandler.get_dataloader_single_folder(
+            data_directory, batch_size=batch_size)
+    
+    if dir_type == "sep":
+        dataloaders = datahandler.get_dataloader_sep_folder(
+            data_directory, batch_size=batch_size)
+
     _ = train_model(model,
                     criterion,
                     dataloaders,
