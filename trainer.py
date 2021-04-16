@@ -67,6 +67,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
 
                     if phase == 'Test':
                         # im = Image.fromarray(outputs['out'].data.cpu().numpy())
+                        # t = outputs['out'].data.cpu().numpy()
                         im = Image.fromarray((outputs['out'].data.cpu().numpy()[0,0,:,:]*255).astype(np.uint8))
                         im.save("out_" + str(i) + ".jpg")
 
