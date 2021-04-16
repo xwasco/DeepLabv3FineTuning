@@ -5,6 +5,8 @@ from torchvision import transforms
 
 from segdataset import SegmentationDataset
 
+from torchvision.transforms import functional as TF
+
 
 def get_dataloader_sep_folder(data_dir: str,
                               image_folder: str = 'Image',
@@ -39,7 +41,11 @@ def get_dataloader_sep_folder(data_dir: str,
         dataloaders: Returns dataloaders dictionary containing the
         Train and Test dataloaders.
     """
-    data_transforms = transforms.Compose([transforms.ToTensor()])
+    data_transforms = transforms.Compose([
+        #transforms.Resize(300,500),
+        transforms.ToTensor() #,
+        #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
 
     image_datasets = {
         x: SegmentationDataset(root=Path(data_dir) / x,
@@ -77,7 +83,11 @@ def get_dataloader_single_folder(data_dir: str,
         dataloaders: Returns dataloaders dictionary containing the
         Train and Test dataloaders.
     """
-    data_transforms = transforms.Compose([transforms.ToTensor()])
+    data_transforms = transforms.Compose([
+        #transforms.Resize(300,500),
+        transforms.ToTensor()#,
+        #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
 
     image_datasets = {
         x: SegmentationDataset(data_dir,

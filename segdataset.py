@@ -8,6 +8,9 @@ from typing import Any, Callable, Optional
 import numpy as np
 from PIL import Image
 from torchvision.datasets.vision import VisionDataset
+import torchvision.transforms.functional as TF
+from torchvision import transforms
+import random
 
 
 class SegmentationDataset(VisionDataset):
@@ -114,8 +117,30 @@ class SegmentationDataset(VisionDataset):
                 mask = mask.convert("L")
 
             sample = {"image": image, "mask": mask}
+            # print(image_file, image.size, mask_file, mask.size)
 
             if self.transforms:
-                sample["image"] = self.transforms(sample["image"])
-                sample["mask"] = self.transforms(sample["mask"])
+
+                resize = transforms.Resize(size=(224))
+                image = resize(sample["image"])
+                mask = resize(sample["mask"])
+
+                # Random crop
+                i, j, h, w = transforms.RandomCrop.get_params(
+                    image, output_size=(224, 350))
+                image = TF.crop(image, i, j, h, w)
+                mask = TF.crop(mask, i, j, h, w)
+
+                # Random horizontal flipping
+                if random.random() > 0.5:
+                    image = TF.hflip(image)
+                    mask = TF.hflip(mask)
+
+                # Random vertical flipping
+                if random.random() > 0.5:
+                    image = TF.vflip(image)
+                    mask = TF.vflip(mask)
+
+                sample["image"] = TF.to_tensor(image)  # self.transforms(sample["image"])
+                sample["mask"] = TF.to_tensor(mask)  #self.transforms(sample["mask"])
             return sample

@@ -47,6 +47,9 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                 # zero the parameter gradients
                 optimizer.zero_grad()
 
+                # print(inputs.shape)
+                # print(masks.shape)
+
                 # track history if only in train
                 with torch.set_grad_enabled(phase == 'Train'):
                     outputs = model(inputs)
@@ -57,7 +60,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                         if name == 'f1_score':
                             # Use a classification threshold of 0.1
                             batchsummary[f'{phase}_{name}'].append(
-                                metric(y_true > 0, y_pred > 0.1))
+                                metric(y_true > 0, y_pred > 0.01))
                         else:
                             batchsummary[f'{phase}_{name}'].append(
                                 metric(y_true.astype('uint8'), y_pred))
