@@ -32,6 +32,8 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
         # Initialize batch summary
         batchsummary = {a: [0] for a in fieldnames}
 
+        torch.save(model, 'weights.pt')
+
         for phase in ['Train', 'Test']:
             if phase == 'Train':
                 model.train()  # Set model to training mode
@@ -62,8 +64,13 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                             batchsummary[f'{phase}_{name}'].append(
                                 metric(y_true > 0, y_pred > 0.01))
                         else:
-                            batchsummary[f'{phase}_{name}'].append(
-                                metric(y_true.astype('uint8'), y_pred))
+                            v = -1
+                            try:
+                                v = metric(y_true.astype('uint8'), y_pred)
+                            except:
+                                print('ehm')
+
+                            batchsummary[f'{phase}_{name}'].append(v)
 
                     if phase == 'Test':
                         # im = Image.fromarray(outputs['out'].data.cpu().numpy())
@@ -76,6 +83,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath,
                     if phase == 'Train':
                         loss.backward()
                         optimizer.step()
+
             batchsummary['epoch'] = epoch
             epoch_loss = loss
             batchsummary[f'{phase}_loss'] = epoch_loss.item()
