@@ -127,7 +127,7 @@ class SegmentationDataset(VisionDataset):
 
                 # Random crop
                 i, j, h, w = transforms.RandomCrop.get_params(
-                    image, output_size=(224, 350))
+                    image, output_size=(224, 224))
                 image = TF.crop(image, i, j, h, w)
                 mask = TF.crop(mask, i, j, h, w)
 
